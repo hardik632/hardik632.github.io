@@ -1,1 +1,190 @@
-Hello World
+ <html>
+     <head>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+<script>
+        var dataURL;
+    var canvas, ctx, flag = false,
+        prevX = 0,
+        currX = 0,
+        prevY = 0,
+        currY = 0,
+        dot_flag = false;
+
+    var col = "black",
+        y = 2;
+    
+    function init() {
+        canvas = document.getElementById('can');
+        ctx = canvas.getContext("2d");
+        w = canvas.width;
+        h = canvas.height;
+    
+        canvas.addEventListener("mousemove", function (e) {
+            coordinates('move', e)
+        }, false);
+        canvas.addEventListener("mousedown", function (e) {
+            coordinates('down', e)
+        }, false);
+        canvas.addEventListener("mouseup", function (e) {
+            coordinates('up', e)
+        }, false);
+        canvas.addEventListener("mouseout", function (e) {
+            coordinates('out', e)
+        }, false);
+    }
+    
+    function color(obj) {
+        switch (obj.id) {
+            case "red":
+                col = "red";
+                break;
+            case "green":
+                col = "green";
+                break;
+            case "yellow":
+                col = "yellow";
+                break;
+            case "blue":
+                col = "blue";
+                break;
+        }    
+    }
+    
+    function draw() {
+        ctx.beginPath();
+        ctx.moveTo(prevX, prevY);
+        ctx.lineTo(currX, currY);
+        ctx.strokeStyle = col;
+        ctx.lineWidth = y;
+        ctx.stroke();
+        ctx.closePath();
+    }
+    
+    
+    function save() {
+        document.getElementById("canvasimg").style.border = "2px solid";
+        
+        // document.getElementById("canvasimg").src = dataURL;
+        // document.getElementById("canvasimg").style.display = "inline";
+    }
+    
+    function coordinates(res, e) {
+        if (res == 'down') {
+            prevX = currX;
+            prevY = currY;
+            currX = e.clientX - canvas.offsetLeft;
+            currY = e.clientY - canvas.offsetTop;
+    
+            flag = true;
+            dot_flag = true;
+            if (dot_flag) {
+                ctx.beginPath();
+                ctx.fillStyle = col;
+                ctx.fillRect(currX, currY, 2, 2);
+                ctx.closePath();
+                dot_flag = false;
+            }
+        }
+        if (res == 'up' || res == "out") {
+            flag = false;
+        }
+        if (res == 'move') {
+            if (flag) {
+                prevX = currX;
+                prevY = currY;
+                currX = e.clientX - canvas.offsetLeft;
+                currY = e.clientY - canvas.offsetTop;
+                draw();
+            }
+        }
+    }
+
+   
+function download(){
+    var pdf = new jsPDF();
+    dataURL = canvas.toDataURL();
+    console.log(dataURL);
+    pdf.addImage(dataURL, 'JPEG', 15, 40, 180, 160);
+    pdf.save('drawing.pdf');
+}
+
+</script>
+        <style>
+            body{
+    background-color: azure;
+}
+#can
+{
+   position:absolute;
+   top:20%;
+   left:35%;
+   border:purple 2px solid;
+}
+ul
+{
+    list-style-type: none;
+    margin-top:6%;
+}
+li
+{
+    display: inline;
+    padding:14px;
+}
+#red
+{
+   border:red 2px solid;
+   border-radius: 60%; margin-left:35%;
+}
+#red:active
+{
+    background-color: red;
+}
+#green
+{               
+   border:green 2px solid;
+   border-radius: 50%;   margin-left:1%
+}
+#green:active
+{
+    background-color: green;
+}
+#yellow
+{                
+   border:yellow 2px solid;
+   border-radius: 50%;   margin-left:1%
+}
+#yellow:active
+{
+    background-color: yellow;
+}
+#blue
+{                
+   border:blue 2px solid;
+   border-radius: 50%;   margin-left:1%
+}
+#blue:active
+{
+    background-color: blue;
+}
+#download
+{
+    text-align: center;
+    position: absolute;
+    top:85%;
+    left:45%
+
+}
+    </style>
+     </head>
+   
+    <body onload="init()">
+        <canvas id="can" width="400" height="400"></canvas>
+        <ul class = "colors">
+        <li id="red" onclick="color(this)"></i></li>
+        <li  id="green" onclick="color(this)"></li>
+        <li id="yellow" onclick="color(this)"></li>
+        <li  id="blue" onclick="color(this)"></li>
+    </ul>
+    <button id="download" onclick="download()">Download the PDF</button>
+    </body>
+    </html>
